@@ -13,7 +13,7 @@ This repository is for a group project of CSCI2500.
 ## Instruction
 Run it by typing
 
-'''bash
+```bash
 make all
 ./iplc-sim
-'''
+```
