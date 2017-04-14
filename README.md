@@ -7,7 +7,7 @@ This repository is for a [group project](https://piazza-resources.s3.amazonaws.c
 ## Contributor
   * Xi Chen
   * Weike Dai
-  * Zhilin Han
+  * [@zhlnhn](https://github.com/zhlnhn)(Zhilin Han)
   * Kexin Zhu
 
 ## Instruction
