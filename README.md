@@ -19,5 +19,5 @@ $ make all
 $ ./iplc-sim
 ```
 ## Resource
-  * Computer Orgnazation
+  * [Computer Orgnazation](https://piazza.com/rpi/spring2017/csci2500/resources)
 
