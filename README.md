@@ -6,7 +6,7 @@ This repository is for a [group project](https://piazza-resources.s3.amazonaws.c
 
 ## Contributor
   * Xi Chen
-  * Weike Dai
+  * Weike Dai([@daiwk1995](https://github.com/daiwk1995))
   * Zhilin Han([@zhlnhn](https://github.com/zhlnhn))
   * Kexin Zhu
 
