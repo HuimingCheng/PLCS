@@ -18,3 +18,6 @@ $ cd <source folder>
 $ make all
 $ ./iplc-sim
 ```
+## Resource
+  * Computer Orgnazation
+
