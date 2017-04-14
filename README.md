@@ -14,6 +14,7 @@ This repository is for a [group project](https://piazza-resources.s3.amazonaws.c
 Run it by typing
 
 ```bash
-make all
-./iplc-sim
+$ cd <source folder>
+$ make all
+$ ./iplc-sim
 ```
