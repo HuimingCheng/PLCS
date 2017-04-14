@@ -1,10 +1,19 @@
 # PLCS
 A Pipeline Cache Simulator
+
 ## Purpose
 This repository is for a group project of CSCI2500.
 
-Contributer
+## Contributer
   * Zhilin Han
   * Weike Dai
   * Kexin Zhu
   * Xi Chen
+
+## Instruction
+Run it by typing
+
+'''bash
+make all
+./iplc-sim
+'''
