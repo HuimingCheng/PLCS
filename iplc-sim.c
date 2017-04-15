@@ -350,6 +350,9 @@ void iplc_sim_push_pipeline_stage()
     /* 1. Count WRITEBACK stage is "retired" -- This I'm giving you */
     if (pipeline[WRITEBACK].instruction_address) {
         instruction_count++;
+        if (debug)
+            printf("DEBUG: Retired Instruction at 0x%x, Type %d, at Time %u \n",
+                   pipeline[WRITEBACK].instruction_address, pipeline[WRITEBACK].itype, pipeline_cycles);
     }
 
     /* 2. Check for BRANCH and correct/incorrect Branch Prediction */
