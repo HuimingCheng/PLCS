@@ -392,6 +392,7 @@ void iplc_sim_push_pipeline_stage()
                 pipeline[WRITEBACK] = pipeline[MEM];
                 pipeline[MEM].itype = NOP;
                 pipeline[MEM].instruction_address = 0x0;
+                instruction_count++;
             }
             // Add stall penalty to the pipeline_cycles
             pipeline_cycles += 9;
