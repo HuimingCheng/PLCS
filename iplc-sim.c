@@ -170,11 +170,11 @@ void iplc_sim_init(int index, int blocksize, int assoc)
 
     // Dynamically create our cache based on the information the user entered
     for (i = 0; i < (1<<index); i++) {
-      cache[i].valid_bit=(int *)malloc((sizeof(int) * asscoc));
-      cache[i].tag=(int *)malloc((sizeof(int) * asscoc));
-      cache[i].replacement=(int *)malloc((sizeof(int) * asscoc));
+      cache[i].valid_bit=(int *)malloc((sizeof(int) * assoc));
+      cache[i].tag=(int *)malloc((sizeof(int) * assoc));
+      cache[i].replacement=(int *)malloc((sizeof(int) * assoc));
     }
-    for(j=0;j<asscoc;j++){
+    for(j=0;j<assoc;j++){
       cache[i].valid_bit[j]= 0;
       cache[i].tag[j] = 0;
       cache[i].replacement[j] = j;
@@ -194,15 +194,14 @@ void iplc_sim_LRU_replace_on_miss(int index, int tag)
 {
     int i=0, j=0;
     j = cache[index].replacement[0];
-    cache[index].assoc[j].tag = tag;
+    cache[index].tag[j] = tag;
     /* You must implement this function */
-    int i = 0, j = 0;
     int tmp = 0;
 
     /* Note: item 0 is the least recently used cache slot -- so replace it */
     tmp=cache[index].replacement[0];
     cache[index].tag[tmp] = tag;
-    cache[index].vb[tmp] = 1;
+    cache[index].valid_bit[tmp] = 1;
     /* percolate everything up */
     for (i = 1; i <= cache_assoc-1; i++) {
         cache[index].replacement[i-1] = cache[index].replacement[i];
@@ -375,7 +374,7 @@ void iplc_sim_push_pipeline_stage()
         int inserted_nop = 0;
 
         data_hit = iplc_sim_trap_address(pipeline[MEM].stage.lw.data_address);
-        if (data_hit == 0)
+        if (data_hit == 0){
             // Check if there is a dependent RTYPE in the ALU stage that depends on the item being loaded. If yes, increment inserted_nop by 1.
             if(pipeline[ALU].itype == RTYPE) {
                 if (pipeline[ALU].stage.rtype.reg1 == pipeline[MEM].stage.lw.dest_reg ||
@@ -395,21 +394,22 @@ void iplc_sim_push_pipeline_stage()
     }
 
     /* 4. Check for SW mem acess and data miss .. add delay cycles if needed */
-    if (pipeline[MEM].itype == SW) {
+    if(pipeline[MEM].itype == SW) {
         data_hit = iplc_sim_trap_address(pipeline[MEM].stage.sw.data_address);
         if (!data_hit) {
             pipeline_cycles += 9;
+          }
     }
 
     /* 5. Increment pipe_cycles 1 cycle for normal processing */
     pipeline_cycles++;
-     
+
     /* 6. push stages thru MEM->WB, ALU->MEM, DECODE->ALU, FETCH->ALU */
     pipeline[WRITEBACK] = pipeline[MEM];
     pipeline[MEM] = pipeline[ALU];
     pipeline[ALU] = pipeline[DECODE];
     pipeline[DECODE] = pipeline[FETCH];
-     
+
     // 7. This is a give'me -- Reset the FETCH stage to NOP via bezero */
     bzero(&(pipeline[FETCH]), sizeof(pipeline_t));
 }
