@@ -374,7 +374,6 @@ void iplc_sim_push_pipeline_stage()
     if (pipeline[MEM].itype == LW) {
         int inserted_nop = 0;
      
-     
         data_hit = iplc_sim_trap_address(pipeline[MEM].stage.lw.data_address);
         if (data_hit == 0) 
             // Check if there is a dependent RTYPE in the ALU stage that depends on the item being loaded. If yes, increment inserted_nop by 1.
@@ -386,13 +385,11 @@ void iplc_sim_push_pipeline_stage()
             }
             // If inserted_nop is 1, insert a NOP instruction.
             if (inserted_nop == 1) {
-          
                 pipeline[WRITEBACK] = pipeline[MEM];
                 pipeline[MEM].itype = NOP;
                 pipeline[MEM].instruction_address = 0x0;
             }
             // Add stall penalty to the pipeline_cycles
-           
             pipeline_cycles += 9;
         }
     }
