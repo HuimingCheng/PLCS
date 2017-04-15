@@ -247,8 +247,33 @@ int iplc_sim_trap_address(unsigned int address)
     int hit=0;
 
     // Call the appropriate function for a miss or hit
-
+    cache_access++;
+    tag=address>>(cache_blockoffsetbits+cache_index);
+    index = (address - (tag << (cache_index + cache_blockoffsetbits))) >> (cache_blockoffsetbits);
     /* expects you to return 1 for hit, 0 for miss */
+    for (i = 0; i < cache_assoc; i++) {
+        if (cache[index].tag[i] == tag) {
+            // hit if tag matches the one in same cache block (same index)
+            hit = 1;
+            break;
+        }
+    }
+    if (hit == 1) {
+        cache_hit++; // increment cache_hit if hit
+        iplc_sim_LRU_update_on_hit(index, i);
+    }
+    else {
+        cache_miss++; // increment cache_miss if miss
+        if (cache[index].valid_bit[i-1] == 0) {
+            // save the tag value and turn on the valid bit if vb == 0
+            cache[index].valid_bit[i-1] = 1;
+            cache[index].tag[i-1] = tag;
+        }
+        else {
+            // if the block is occupied, replace on miss
+            iplc_sim_LRU_replace_on_miss(index, tag);
+        }
+    }
     return hit;
 }
 
