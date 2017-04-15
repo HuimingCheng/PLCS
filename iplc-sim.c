@@ -192,6 +192,9 @@ void iplc_sim_init(int index, int blocksize, int assoc)
  */
 void iplc_sim_LRU_replace_on_miss(int index, int tag)
 {
+    int i=0, j=0;
+    j = cache[index].replacement[0];
+    cache[index].assoc[j].tag = tag;
     /* You must implement this function */
 }
 
