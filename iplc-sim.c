@@ -351,9 +351,6 @@ void iplc_sim_push_pipeline_stage()
     /* 1. Count WRITEBACK stage is "retired" -- This I'm giving you */
     if (pipeline[WRITEBACK].instruction_address) {
         instruction_count++;
-        if (debug)
-            printf("DEBUG: Retired Instruction at 0x%x, Type %d, at Time %u \n",
-                   pipeline[WRITEBACK].instruction_address, pipeline[WRITEBACK].itype, pipeline_cycles);
     }
 
     /* 2. Check for BRANCH and correct/incorrect Branch Prediction */
@@ -379,8 +376,7 @@ void iplc_sim_push_pipeline_stage()
      
      
         data_hit = iplc_sim_trap_address(pipeline[MEM].stage.lw.data_address);
-        if (data_hit == 0) {
-            //printf("DATA MISS:\t Address 0x%x \n", data_address);
+        if (data_hit == 0) 
             // Check if there is a dependent RTYPE in the ALU stage that depends on the item being loaded. If yes, increment inserted_nop by 1.
             if(pipeline[ALU].itype == RTYPE) {
                 if (pipeline[ALU].stage.rtype.reg1 == pipeline[MEM].stage.lw.dest_reg ||
@@ -390,23 +386,15 @@ void iplc_sim_push_pipeline_stage()
             }
             // If inserted_nop is 1, insert a NOP instruction.
             if (inserted_nop == 1) {
-                printf("DEBUG: NOP inserted due to LW/Reg use in ALU stage 0x%x\n", pipeline[MEM].instruction_address);
+          
                 pipeline[WRITEBACK] = pipeline[MEM];
                 pipeline[MEM].itype = NOP;
                 pipeline[MEM].instruction_address = 0x0;
-                if (pipeline[WRITEBACK].instruction_address) {
-                    if (debug)
-                        //printf("DEBUG: Retired Instruction at 0x%x, Type %d, at Time %u \n",
-                               pipeline[WRITEBACK].instruction_address, pipeline[WRITEBACK].itype, pipeline_cycles+inserted_nop);
-                }
             }
             // Add stall penalty to the pipeline_cycles
-            //printf("DEBUG: LW STALL due to use in ALU stage with data MISS at instruction 0x%x\n", pipeline[WRITEBACK].instruction_address);
+           
             pipeline_cycles += 9;
         }
-        //if (data_hit == 1) {
-            //printf("DATA HIT:\t Address 0x%x \n", data_address);
-        //}
     }
 
     /* 4. Check for SW mem acess and data miss .. add delay cycles if needed */
