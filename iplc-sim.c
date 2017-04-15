@@ -397,7 +397,7 @@ void iplc_sim_push_pipeline_stage()
     /* 4. Check for SW mem acess and data miss .. add delay cycles if needed */
     if (pipeline[MEM].itype == SW) {
         data_hit = iplc_sim_trap_address(pipeline[MEM].stage.sw.data_address);
-        if (data_hit == 0) {
+        if (!data_hit) {
             pipeline_cycles += 9;
     }
 
