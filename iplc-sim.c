@@ -225,9 +225,9 @@ void iplc_sim_LRU_update_on_hit(int index, int assoc_entry)
     }
     /* percolate everything up */
     for (i = j+1; i < cache_assoc; i++) {
+
         cache[index].replacement[i-1] = cache[index].replacement[i];
     }
-
     cache[index].replacement[cache_assoc-1] = assoc_entry;
 }
 
