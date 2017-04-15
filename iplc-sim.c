@@ -173,12 +173,13 @@ void iplc_sim_init(int index, int blocksize, int assoc)
       cache[i].valid_bit=(int *)malloc((sizeof(int) * assoc));
       cache[i].tag=(int *)malloc((sizeof(int) * assoc));
       cache[i].replacement=(int *)malloc((sizeof(int) * assoc));
+      for(j=0;j<assoc;j++){
+        cache[i].valid_bit[j]= 0;
+        cache[i].tag[j] = 0;
+        cache[i].replacement[j] = j;
+      }
     }
-    for(j=0;j<assoc;j++){
-      cache[i].valid_bit[j]= 0;
-      cache[i].tag[j] = 0;
-      cache[i].replacement[j] = j;
-    }
+
     // init the pipeline -- set all data to zero and instructions to NOP
     for (i = 0; i < MAX_STAGES; i++) {
         // itype is set to O which is NOP type instruction
