@@ -196,6 +196,18 @@ void iplc_sim_LRU_replace_on_miss(int index, int tag)
     j = cache[index].replacement[0];
     cache[index].assoc[j].tag = tag;
     /* You must implement this function */
+    int i = 0, j = 0;
+    int tmp = 0;
+
+    /* Note: item 0 is the least recently used cache slot -- so replace it */
+    tmp=cache[index].replacement[0];
+    cache[index].tag[tmp] = tag;
+    cache[index].vb[tmp] = 1;
+    /* percolate everything up */
+    for (i = 1; i <= cache_assoc-1; i++) {
+        cache[index].replacement[i-1] = cache[index].replacement[i];
+    }
+    cache[index].replacement[cache_assoc-1] = tmp;
 }
 
 /*
@@ -205,6 +217,21 @@ void iplc_sim_LRU_replace_on_miss(int index, int tag)
 void iplc_sim_LRU_update_on_hit(int index, int assoc_entry)
 {
     /* You must implement this function */
+    int i=0, j=0;
+
+    for (j = 0; j < cache_assoc; j++) {
+        if (cache[index].replacement[j] == assoc_entry) {
+            break;
+        }
+    }
+    /* percolate everything up */
+    for (i = j+1; i < cache_assoc; i++) {
+        printf("%d About to change cache[%d].replacement from %d to %d\n", i, index, i-1, i);
+        cache[index].replacement[i-1] = cache[index].replacement[i];
+    }
+
+    printf("%d About to change cache[%d].replacement from %d to %d\n", cache_assoc, index, cache_assoc-1, j);
+    cache[index].replacement[cache_assoc-1] = assoc_entry;
 }
 
 /*
