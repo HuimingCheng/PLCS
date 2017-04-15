@@ -70,7 +70,7 @@ unsigned int branch_predict_taken=0;
 unsigned int branch_count=0;
 unsigned int correct_branch_predictions=0;
 
-unsigned int debug=1;
+unsigned int debug=0;
 unsigned int dump_pipeline=1;
 
 enum instruction_type {NOP, RTYPE, LW, SW, BRANCH, JUMP, JAL, SYSCALL};
@@ -173,13 +173,12 @@ void iplc_sim_init(int index, int blocksize, int assoc)
       cache[i].valid_bit=(int *)malloc((sizeof(int) * assoc));
       cache[i].tag=(int *)malloc((sizeof(int) * assoc));
       cache[i].replacement=(int *)malloc((sizeof(int) * assoc));
-      for(j=0;j<assoc;j++){
-        cache[i].valid_bit[j]= 0;
-        cache[i].tag[j] = 0;
-        cache[i].replacement[j] = j;
-      }
+    for(j=0;j<assoc;j++){
+      cache[i].valid_bit[j]= 0;
+      cache[i].tag[j] = 0;
+      cache[i].replacement[j] = j;
     }
-
+  }
     // init the pipeline -- set all data to zero and instructions to NOP
     for (i = 0; i < MAX_STAGES; i++) {
         // itype is set to O which is NOP type instruction
@@ -226,11 +225,9 @@ void iplc_sim_LRU_update_on_hit(int index, int assoc_entry)
     }
     /* percolate everything up */
     for (i = j+1; i < cache_assoc; i++) {
-        printf("%d About to change cache[%d].replacement from %d to %d\n", i, index, i-1, i);
         cache[index].replacement[i-1] = cache[index].replacement[i];
     }
 
-    printf("%d About to change cache[%d].replacement from %d to %d\n", cache_assoc, index, cache_assoc-1, j);
     cache[index].replacement[cache_assoc-1] = assoc_entry;
 }
 
@@ -250,6 +247,7 @@ int iplc_sim_trap_address(unsigned int address)
     cache_access++;
     tag=address>>(cache_blockoffsetbits+cache_index);
     index = (address - (tag << (cache_index + cache_blockoffsetbits))) >> (cache_blockoffsetbits);
+    printf("Address %x: Tag= %x, Index= %x\n", address, tag, index);
     /* expects you to return 1 for hit, 0 for miss */
     for (i = 0; i < cache_assoc; i++) {
         if (cache[index].tag[i] == tag) {
@@ -358,8 +356,8 @@ void iplc_sim_push_pipeline_stage()
 
     /* 2. Check for BRANCH and correct/incorrect Branch Prediction */
     if (pipeline[DECODE].itype == BRANCH) {
-        int branch_taken = 0;
         branch_count++;
+        int branch_taken = 0;
         if(pipeline[FETCH].itype!=NOP){
           if(pipeline[DECODE].instruction_address+4!=pipeline[FETCH].instruction_address){
             branch_taken = 1;
@@ -380,6 +378,7 @@ void iplc_sim_push_pipeline_stage()
 
         data_hit = iplc_sim_trap_address(pipeline[MEM].stage.lw.data_address);
         if (data_hit == 0){
+          printf("DATA MISS:\t Address 0x%x \n", data_address);
             // Check if there is a dependent RTYPE in the ALU stage that depends on the item being loaded. If yes, increment inserted_nop by 1.
             if(pipeline[ALU].itype == RTYPE) {
                 if (pipeline[ALU].stage.rtype.reg1 == pipeline[MEM].stage.lw.dest_reg ||
@@ -389,13 +388,23 @@ void iplc_sim_push_pipeline_stage()
             }
             // If inserted_nop is 1, insert a NOP instruction.
             if (inserted_nop == 1) {
+              printf("DEBUG: NOP inserted due to LW/Reg use in ALU stage 0x%x\n", pipeline[MEM].instruction_address);
+                instruction_count++;
                 pipeline[WRITEBACK] = pipeline[MEM];
                 pipeline[MEM].itype = NOP;
                 pipeline[MEM].instruction_address = 0x0;
-                instruction_count++;
+                if (pipeline[WRITEBACK].instruction_address) {
+                    if (debug)
+                        printf("DEBUG: Retired Instruction at 0x%x, Type %d, at Time %u \n",
+                               pipeline[WRITEBACK].instruction_address, pipeline[WRITEBACK].itype, pipeline_cycles+inserted_nop);
+                }
             }
             // Add stall penalty to the pipeline_cycles
+            printf("DEBUG: LW STALL due to use in ALU stage with data MISS at instruction 0x%x\n", pipeline[WRITEBACK].instruction_address);
             pipeline_cycles += 9;
+        }
+        if (data_hit == 1) {
+            printf("DATA HIT:\t Address 0x%x \n", data_address);
         }
     }
 
@@ -404,6 +413,7 @@ void iplc_sim_push_pipeline_stage()
         data_hit = iplc_sim_trap_address(pipeline[MEM].stage.sw.data_address);
         if (!data_hit) {
             pipeline_cycles += 9;
+            printf("DATA MISS:\t Address 0x%x \n", data_address);
           }
     }
 
