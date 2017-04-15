@@ -244,10 +244,11 @@ int iplc_sim_trap_address(unsigned int address)
     int hit=0;
 
     // Call the appropriate function for a miss or hit
-    cache_access++;
+
     tag=address>>(cache_blockoffsetbits+cache_index);
     index = (address - (tag << (cache_index + cache_blockoffsetbits))) >> (cache_blockoffsetbits);
-    printf("Address %x: Tag= %x, Index= %x\n", address, tag, index);
+    printf("Address %x: Tag= %x, Index= %x \n", address, tag, index);
+    cache_access++;
     /* expects you to return 1 for hit, 0 for miss */
     for (i = 0; i < cache_assoc; i++) {
         if (cache[index].tag[i] == tag) {
@@ -388,7 +389,6 @@ void iplc_sim_push_pipeline_stage()
             }
             // If inserted_nop is 1, insert a NOP instruction.
             if (inserted_nop == 1) {
-              printf("DEBUG: NOP inserted due to LW/Reg use in ALU stage 0x%x\n", pipeline[MEM].instruction_address);
                 instruction_count++;
                 pipeline[WRITEBACK] = pipeline[MEM];
                 pipeline[MEM].itype = NOP;
@@ -399,8 +399,7 @@ void iplc_sim_push_pipeline_stage()
                                pipeline[WRITEBACK].instruction_address, pipeline[WRITEBACK].itype, pipeline_cycles+inserted_nop);
                 }
             }
-            // Add stall penalty to the pipeline_cycles
-            printf("DEBUG: LW STALL due to use in ALU stage with data MISS at instruction 0x%x\n", pipeline[WRITEBACK].instruction_address);
+            // Add stall penalty to the pipeline_cycles pipeline[WRITEBACK].instruction_address);
             pipeline_cycles += 9;
         }
         if (data_hit == 1) {
