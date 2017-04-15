@@ -44,6 +44,9 @@ typedef struct cache_line
     // a tag
     // a method for handling varying levels of associativity
     // a method for selecting which item in the cache is going to be replaced
+    int *valid_bit;
+    int *tag;
+    int *replacement;
 } cache_line_t;
 
 cache_line_t *cache=NULL;
