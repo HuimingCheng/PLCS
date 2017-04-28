@@ -180,21 +180,20 @@ void iplc_sim_init(int index, int blocksize, int assoc) {
  * and make sure that is now our Most Recently Used (MRU) entry.
  */
 void iplc_sim_LRU_replace_on_miss(int index, int tag) {
-  int i = 0, j = 0;
-  j = cache[index].replacement[0];
-  cache[index].tag[j] = tag;
-  /* You must implement this function */
-  int tmp = 0;
-
-  /* Note: item 0 is the least recently used cache slot -- so replace it */
-  tmp = cache[index].replacement[0];
-  cache[index].tag[tmp] = tag;
-  cache[index].valid_bit[tmp] = 1;
-  /* percolate everything up */
-  for (i = 1; i <= cache_assoc - 1; i++) {
-    cache[index].replacement[i - 1] = cache[index].replacement[i];
-  }
-  cache[index].replacement[cache_assoc - 1] = tmp;
+    /* You must implement this function */
+    int i,tmp;
+    cache[index].tag[j] = tag;
+    
+    //index 0 element is the least recently use element, replace it
+    tmp = cache[index].replacement[0];
+    cache[index].tag[tmp] = tag;
+    cache[index].valid_bit[tmp] = 1;
+    // change the order in the slots
+    for (i = 1; i < cache_assoc; ++i) {
+        cache[index].replacement[i - 1] = cache[index].replacement[i];
+    }
+    //the current memory is at the end of the slot
+    cache[index].replacement[cache_assoc - 1] = tmp;
 }
 
 /*
@@ -202,21 +201,24 @@ void iplc_sim_LRU_replace_on_miss(int index, int tag) {
  * information in the cache.
  */
 void iplc_sim_LRU_update_on_hit(int index, int assoc_entry) {
-  /* You must implement this function */
-  int i = 0, j = 0;
-
-  for (j = 0; j < cache_assoc; j++) {
-    if (cache[index].replacement[j] == assoc_entry) {
-      break;
+    /* You must implement this function */
+    int i,j;
+    
+    for (j = 0; j < cache_assoc; j++) {
+        // when find the assoc_entry break the loop
+        if (cache[index].replacement[j] == assoc_entry) {
+            break;
+        }
     }
-  }
-  /* percolate everything up */
-  for (i = j + 1; i < cache_assoc; i++) {
-
-    cache[index].replacement[i - 1] = cache[index].replacement[i];
-  }
-  cache[index].replacement[cache_assoc - 1] = assoc_entry;
+    //replace [i-1] with [i]
+    for (i = j+1; i < cache_assoc; ++i) {
+        cache[index].replacement[i-1] = cache[index].replacement[i];
+    }
+    //change the last index as the new read in memory
+    cache[index].replacement[cache_assoc - 1] = assoc_entry;
 }
+
+
 
 /*
  * Check if the address is in our cache.  Update our counter statistics
