@@ -351,16 +351,17 @@ void iplc_sim_push_pipeline_stage() {
   if (pipeline[DECODE].itype == BRANCH) {
     branch_count++;
     int branch_taken = 0;
-    if (pipeline[FETCH].itype != NOP) {
+    if (pipeline[FETCH].instruction_address) {
+    //Casting them to signed 64 bits so we don't accidentally cause an underflow
       if (pipeline[DECODE].instruction_address + 4 !=
           pipeline[FETCH].instruction_address) {
         branch_taken = 1;
       }
-      if (branch_taken == branch_predict_taken) {
-        correct_branch_predictions++;
-      } else { // If branch prediction is incorrect, increment the
-               // pipeline_cycles by 1.
+      // If branch prediction is incorrect, increment pipeline_cycles.
+      if (branch_taken != branch_predict_taken) {
         pipeline_cycles++;
+      } else {
+        correct_branch_predictions++;
       }
     }
   }
