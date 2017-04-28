@@ -237,28 +237,26 @@ int iplc_sim_trap_address(unsigned int address) {
     /* expects you to return 1 for hit, 0 for miss */
     for (i = 0; i < cache_assoc; i++) {
         if (cache[index].tag[i] == tag) {
-            // if find same tag in the slot, flag hit
+            //call hit function
+            iplc_sim_LRU_update_on_hit(index, i);
+            // increment if there is a hit
+            cache_hit++;
             hit = 1;
-            break;
+            return hit;
         }
     }
-    if (hit) {
-        //call hit function
-        iplc_sim_LRU_update_on_hit(index, i);
-        // increment if there is a hit
-        cache_hit++;
-    } else {
-        //if there is some empty slot, add the tag into the empty slot
-        if (cache[index].valid_bit[i - 1] == 0) {
-            cache[index].valid_bit[i - 1] = 1;
-            cache[index].tag[i - 1] = tag;
-        } else {
-            // if the slot is full
-            iplc_sim_LRU_replace_on_miss(index, tag);
+
+    //if there is some empty slot, add the tag into the empty slot
+    if (cache[index].valid_bit[i - 1] == 0) {
+        cache[index].valid_bit[i - 1] = 1;
+        cache[index].tag[i - 1] = tag;
         }
-        //miss increment
-        cache_miss++;
-    }
+    else {
+        // if the slot is full
+        iplc_sim_LRU_replace_on_miss(index, tag);
+        }
+    //miss increment
+    cache_miss++;
     return hit;
 }
 
