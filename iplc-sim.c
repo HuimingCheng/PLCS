@@ -225,38 +225,43 @@ void iplc_sim_LRU_update_on_hit(int index, int assoc_entry) {
  * desired index.  In that case we will also need to call the LRU functions.
  */
 int iplc_sim_trap_address(unsigned int address) {
-  int i = 0, index = 0;
-  int tag = 0;
-  int hit = 0;
-  tag = address >> (cache_blockoffsetbits + cache_index);
-  index = (address - (tag << (cache_index + cache_blockoffsetbits))) >>
-          (cache_blockoffsetbits);
-  printf("Address %x: Tag= %x, Index= %x \n", address, tag, index);
-  cache_access++;
-  /* return 1 for hit, 0 for miss */
-  for (i = 0; i < cache_assoc; i++) {
-    if (cache[index].tag[i] == tag) {
-      // hit if tag matches the one in same cache block
-      hit = 1;
-      break;
+    int i = 0, index = 0;
+    int tag = 0;
+    int hit = 0;
+    
+    // Call the appropriate function for a miss or hit
+    
+    tag = address >> (cache_blockoffsetbits + cache_index);
+    index = (address - (tag << (cache_index + cache_blockoffsetbits))) >>
+    (cache_blockoffsetbits);
+    printf("Address %x: Tag= %x, Index= %x \n", address, tag, index);
+    cache_access++;
+    /* expects you to return 1 for hit, 0 for miss */
+    for (i = 0; i < cache_assoc; i++) {
+        if (cache[index].tag[i] == tag) {
+            // if find same tag in the slot, flag hit
+            hit = 1;
+            break;
+        }
     }
-  }
-  // increment cache_hit if hit,increment cache_miss if miss
-  if (hit == 1) {
-    cache_hit++;
-    iplc_sim_LRU_update_on_hit(index, i);
-  } else {
-    cache_miss++;
-    if (cache[index].valid_bit[i - 1] == 0) {
-      // save the tag value and turn on the valid bit if valid_bit == 0
-      cache[index].valid_bit[i - 1] = 1;
-      cache[index].tag[i - 1] = tag;
+    if (hit) {
+        //call hit function
+        iplc_sim_LRU_update_on_hit(index, i);
+        // increment if there is a hit
+        cache_hit++;
     } else {
-      // if the block is occupied, replace on miss
-      iplc_sim_LRU_replace_on_miss(index, tag);
+        //if there is some empty slot, add the tag into the empty slot
+        if (cache[index].valid_bit[i - 1] == 0) {
+            cache[index].valid_bit[i - 1] = 1;
+            cache[index].tag[i - 1] = tag;
+        } else {
+            // if the slot is full
+            iplc_sim_LRU_replace_on_miss(index, tag);
+        }
+        //miss increment
+        cache_miss++;
     }
-  }
-  return hit;
+    return hit;
 }
 
 /*
