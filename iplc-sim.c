@@ -441,6 +441,7 @@ void iplc_sim_process_pipeline_rtype(char *instruction, int dest_reg, int reg1,
   pipeline[FETCH].stage.rtype.dest_reg = dest_reg;
 }
 
+// Loadword instruction
 void iplc_sim_process_pipeline_lw(int dest_reg, int base_reg,
                                   unsigned int data_address) {
   /* You must implement this function */
@@ -454,6 +455,7 @@ void iplc_sim_process_pipeline_lw(int dest_reg, int base_reg,
   pipeline[FETCH].stage.lw.base_reg = base_reg;
 }
 
+// Storeword instruction
 void iplc_sim_process_pipeline_sw(int src_reg, int base_reg,
                                   unsigned int data_address) {
   /* You must implement this function */
@@ -467,6 +469,7 @@ void iplc_sim_process_pipeline_sw(int src_reg, int base_reg,
   pipeline[FETCH].stage.sw.base_reg = base_reg;
 }
 
+// Branch instruction
 void iplc_sim_process_pipeline_branch(int reg1, int reg2) {
   /* You must implement this function */
   iplc_sim_push_pipeline_stage();
@@ -478,6 +481,7 @@ void iplc_sim_process_pipeline_branch(int reg1, int reg2) {
   pipeline[FETCH].stage.branch.reg2 = reg2;
 }
 
+// Jump instruction
 void iplc_sim_process_pipeline_jump(char *instruction) {
   /* You must implement this function */
   iplc_sim_push_pipeline_stage();
@@ -488,6 +492,7 @@ void iplc_sim_process_pipeline_jump(char *instruction) {
   strcpy(pipeline[FETCH].stage.jump.instruction, instruction);
 }
 
+// Syscall instruction
 void iplc_sim_process_pipeline_syscall() {
   /* You must implement this function */
   iplc_sim_push_pipeline_stage();
