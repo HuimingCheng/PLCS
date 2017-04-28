@@ -182,8 +182,6 @@ void iplc_sim_init(int index, int blocksize, int assoc) {
 void iplc_sim_LRU_replace_on_miss(int index, int tag) {
     /* You must implement this function */
     int i,tmp;
-    cache[index].tag[j] = tag;
-
     //replace index 0 element,it is the least recently use element
     tmp = cache[index].replacement[0];
     cache[index].tag[tmp] = tag;
