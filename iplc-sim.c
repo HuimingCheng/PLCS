@@ -183,16 +183,16 @@ void iplc_sim_LRU_replace_on_miss(int index, int tag) {
     /* You must implement this function */
     int i,tmp;
     cache[index].tag[j] = tag;
-    
-    //index 0 element is the least recently use element, replace it
+
+    //replace index 0 element,it is the least recently use element
     tmp = cache[index].replacement[0];
     cache[index].tag[tmp] = tag;
     cache[index].valid_bit[tmp] = 1;
-    // change the order in the slots
+    // change the sequence in the slots
     for (i = 1; i < cache_assoc; ++i) {
         cache[index].replacement[i - 1] = cache[index].replacement[i];
     }
-    //the current memory is at the end of the slot
+    //store current memory at the end of the slot
     cache[index].replacement[cache_assoc - 1] = tmp;
 }
 
@@ -203,18 +203,16 @@ void iplc_sim_LRU_replace_on_miss(int index, int tag) {
 void iplc_sim_LRU_update_on_hit(int index, int assoc_entry) {
     /* You must implement this function */
     int i,j;
-    
+            // when find the assoc_entry break the loop
     for (j = 0; j < cache_assoc; j++) {
-        // when find the assoc_entry break the loop
         if (cache[index].replacement[j] == assoc_entry) {
             break;
         }
     }
-    //replace [i-1] with [i]
     for (i = j+1; i < cache_assoc; ++i) {
         cache[index].replacement[i-1] = cache[index].replacement[i];
     }
-    //change the last index as the new read in memory
+    //change the last index to assoc_entry
     cache[index].replacement[cache_assoc - 1] = assoc_entry;
 }
 
@@ -230,29 +228,27 @@ int iplc_sim_trap_address(unsigned int address) {
   int i = 0, index = 0;
   int tag = 0;
   int hit = 0;
-
-  // Call the appropriate function for a miss or hit
-
   tag = address >> (cache_blockoffsetbits + cache_index);
   index = (address - (tag << (cache_index + cache_blockoffsetbits))) >>
           (cache_blockoffsetbits);
   printf("Address %x: Tag= %x, Index= %x \n", address, tag, index);
   cache_access++;
-  /* expects you to return 1 for hit, 0 for miss */
+  /* return 1 for hit, 0 for miss */
   for (i = 0; i < cache_assoc; i++) {
     if (cache[index].tag[i] == tag) {
-      // hit if tag matches the one in same cache block (same index)
+      // hit if tag matches the one in same cache block
       hit = 1;
       break;
     }
   }
+  // increment cache_hit if hit,increment cache_miss if miss
   if (hit == 1) {
-    cache_hit++; // increment cache_hit if hit
+    cache_hit++;
     iplc_sim_LRU_update_on_hit(index, i);
   } else {
-    cache_miss++; // increment cache_miss if miss
+    cache_miss++;
     if (cache[index].valid_bit[i - 1] == 0) {
-      // save the tag value and turn on the valid bit if vb == 0
+      // save the tag value and turn on the valid bit if valid_bit == 0
       cache[index].valid_bit[i - 1] = 1;
       cache[index].tag[i - 1] = tag;
     } else {
