@@ -374,7 +374,7 @@ void iplc_sim_push_pipeline_stage() {
       printf("DATA MISS:\t Address 0x%x \n", data_address);
       // Check if there is a dependent RTYPE in the ALU stage that depends on
       // the item being loaded. If yes, increment inserted_nop by 1.
-      if (pipeline[ALU].itype == RTYPE&&(pipeline[ALU].stage.rtype.reg2_or_constant ==
+      /*if (pipeline[ALU].itype == RTYPE&&(pipeline[ALU].stage.rtype.reg2_or_constant ==
           pipeline[MEM].stage.lw.dest_reg||pipeline[ALU].stage.rtype.reg1 == pipeline[MEM].stage.lw.dest_reg)) {
           inserted_nop=1;
       }
@@ -390,7 +390,7 @@ void iplc_sim_push_pipeline_stage() {
                    pipeline[WRITEBACK].instruction_address,
                    pipeline[WRITEBACK].itype, pipeline_cycles + inserted_nop);
         }
-      }
+      }*/
       // Add stall penalty to the pipeline_cycles
       pipeline_cycles += 9;
     }else{
